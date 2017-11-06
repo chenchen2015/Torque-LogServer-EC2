@@ -15,14 +15,14 @@ Therefore, this motivates me to start building my own log delivery server so I h
 
 
 ## Initial Setup
-I'm using the [Torque webser project by econpy](https://github.com/econpy/torque) as the starting point. And save cost and be versatile, I will be using AWS products to setup the server and related services.
+I'm using the [Torque webser project by econpy](https://github.com/econpy/torque) as a starting point. And to save cost and be versatile, the server will be hosted using AWS EC2 instance.
 
 ### Configure, Launch, and Connect to a New AWS EC2 Instance
 The server will be running on a AWS EC2 instance with Amazon Linux kernel. The first step is to configure the EC2 instance.
 
 1. Get to AWS EC2 and create a new EC2 instance.
 2. In Step 1, choose ```Amazon Linux AMI 2017.09.0 (HVM), SSD Volume Type``` (version might be different as Amazon updates it). This is a Linux kernel that includes most of the necessary packages including PHP and MySQL.
-3. In Step 2, I'm using ```t2.micro``` instance type in order to be qualified for the Free Tier so as to saving cost.
+3. In Step 2, I'm using ```t2.micro``` instance type in order to be qualified for the Free Tier to save money.
 4. Feel free to keep the rest settings default and launch the instance. I did some additional tweaking in the IAM role (created a dedicated role to only allow access to related AWS services) and storage size (16GiB instead of the default 8GiB, still under Free Tier)
 
 Now you can review and launch the instance.
