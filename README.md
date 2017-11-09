@@ -175,3 +175,13 @@ sudo emacs /etc/httpd/conf/httpd.conf
   ```
 
 All set, now you should be able to login to ```phpMyAdmin``` using URL ```http://[EC2 Public DNS Address].amazonaws.com/phpmyadmin```. Use the SQL user name and password you just created or use the root user to login.
+
+## Going Further
+### Automated Deployment
+In my usage case, I mainly logs my driving during daily commute, which means the log server is needed regularly during 8-9:30 am and 4-6 pm from Monday to Friday. Therefore, running the EC2 instance 24/7 definitely sounds unnecessary and will induce additional cost.
+
+Here, I will be implementing an automated deployment architecture to control the log server EC2 instance so it will only be running during active hours that I specified.
+
+**References:**
+- [AWS Documentation - EC2 Scheduler on AWS](http://docs.aws.amazon.com/solutions/latest/ec2-scheduler/deployment.html)
+- [EC2 Scheduler Architecture Overview](https://aws.amazon.com/answers/infrastructure-management/ec2-scheduler/)
