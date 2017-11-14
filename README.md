@@ -185,3 +185,36 @@ Here, I will be implementing an automated deployment architecture to control the
 **References:**
 - [AWS Documentation - EC2 Scheduler on AWS](http://docs.aws.amazon.com/solutions/latest/ec2-scheduler/deployment.html)
 - [EC2 Scheduler Architecture Overview](https://aws.amazon.com/answers/infrastructure-management/ec2-scheduler/)
+
+#### Setting Up
+To start, follow the instructions in the [AWS Documentation - EC2 Scheduler on AWS](http://docs.aws.amazon.com/solutions/latest/ec2-scheduler/deployment.html).
+
+- First launch the CloudFormation template and customize the parameters. Most important things are
+  - *Schedule* - scheduled expression for the CloudWatch Event rule that invokes the EC2 Scheduler Lambda function. Use a short schedule is not necessary and will invoke the Lambda function more frequently, increasing the cost.
+  - *CustomTagName* - identifier for tagging the target EC2 instance. For example, ```scheduler:torqueserver```
+- When the stack deployment has completed, go find the EC2 log server instance and add the following tags based on your need. Use my case as an example, my daily commute during workdays only happens in the early morning and late afternoon. And I will be on a flexible schedule during the weekend. Based on this, my custom tag set is ():
+  - Tag Key ```scheduler:ec2-logserver:weekdayam``` Tag Value ```0800;1100;utc;weekdays```
+  - Tag Key ```scheduler:ec2-logserver:weekdaypm``` Tag Value ```1600;1930;utc;weekdays```
+  - Tag Key ```scheduler:ec2-logserver:weekend``` Tag Value ```0800;2200;utc;sat,sun```
+
+Therefore, with the new automatic scheduler architecture, my weekly active EC2 hours is **60.5 hours**, which tranlates to **~64% of cost reduction** given the total 168 hours in a week.
+
+#### Auto-Restart Services
+Now that the scheduler is properly setup, EC2 will be shut off during inactive hours and rebooted during active hours. The reboot process will cause two major issues. The first issue is restarting service. During reboot, some of the essential services like ```httpd``` and ```mysqld``` will not get automatically retarted by default. You will find the server seems to be down since the API is not running, but the EC2 instance is indeed working, it's just the PHP server or MySQL server isn't. To solve this, simply add ```httpd``` and ```mysqld``` to the auto-restart service list using the following command:
+```bash
+sudo chkconfig mysqld on
+sudo chkconfig httpd on
+```
+
+After running the commands, you can check if they are on the auto-restart list:
+```bash
+sudo chkconfig --list mysqld
+sudo chkconfig --list httpd
+```
+
+Note that they should be ```on``` under runlevel 3.
+
+#### Elastic IP Address
+Another issue is the reboot process will also cause AWS to resign a new public IP address. This is catastrophic given we now don't have a reliable IP address and both us and the Torque app will not be able to connect to the server periodically, unless we manually update the server's new IP address on the Torque app, which is definitely a bad choice.
+
+Good news is, AWS allows EC2 instances to bind to an [Elastic IP Address](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html). Once you allocate the log server instance a dedicated elastic IP address, the new IP address will be reliable regardless what the actual allocated internal/external IP address is. Problem solved!
