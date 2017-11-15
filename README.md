@@ -193,9 +193,9 @@ To start, follow the instructions in the [AWS Documentation - EC2 Scheduler on A
   - *Schedule* - scheduled expression for the CloudWatch Event rule that invokes the EC2 Scheduler Lambda function. Use a short schedule is not necessary and will invoke the Lambda function more frequently, increasing the cost.
   - *CustomTagName* - identifier for tagging the target EC2 instance. For example, ```scheduler:torqueserver```
 - When the stack deployment has completed, go find the EC2 log server instance and add the following tags based on your need. Use my case as an example, my daily commute during workdays only happens in the early morning and late afternoon. And I will be on a flexible schedule during the weekend. Based on this, my custom tag set is ():
-  - Tag Key ```scheduler:ec2-logserver:weekdayam``` Tag Value ```0800;1100;utc;weekdays```
-  - Tag Key ```scheduler:ec2-logserver:weekdaypm``` Tag Value ```1600;1930;utc;weekdays```
-  - Tag Key ```scheduler:ec2-logserver:weekend``` Tag Value ```0800;2200;utc;sat,sun```
+  - Tag Key ```scheduler:ec2-logserver:weekdayam``` Tag Value ```0800;1100;cdt;weekdays```
+  - Tag Key ```scheduler:ec2-logserver:weekdaypm``` Tag Value ```1600;1930;cdt;weekdays```
+  - Tag Key ```scheduler:ec2-logserver:weekend``` Tag Value ```0800;2200;cdt;sat,sun```
 
 Therefore, with the new automatic scheduler architecture, my weekly active EC2 hours is **60.5 hours**, which tranlates to **~64% of cost reduction** given the total 168 hours in a week.
 
@@ -218,3 +218,20 @@ Note that they should be ```on``` under runlevel 3.
 Another issue is the reboot process will also cause AWS to resign a new public IP address. This is catastrophic given we now don't have a reliable IP address and both us and the Torque app will not be able to connect to the server periodically, unless we manually update the server's new IP address on the Torque app, which is definitely a bad choice.
 
 Good news is, AWS allows EC2 instances to bind to an [Elastic IP Address](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html). Once you allocate the log server instance a dedicated elastic IP address, the new IP address will be reliable regardless what the actual allocated internal/external IP address is. Problem solved!
+
+#### Timezone Conversion
+By default, the deployed solution only supports UTC timezone as the input. Therefore, in order to get the right time, I need to manually convert the timezone from local (*e.g.* Chicago time) to UTC timezone format. Instead of manually convert the tag value entries, we can simply override the Lambda code to do the job. The following script is part of the ```TorqueLogServer-EC2Scheduler-ec2SchedulerOptIn-[ID]``` Lambda function. Note that your ```[ID]``` will be different. I'm in the central timezone, hence it will be ```UTC-6``` which means it is 6 hours behind of UTC timezone. 
+```python
+#... Line 90
+
+# Override default timezone from UTC to CDT
+awsregion = region['RegionName']
+now = datetime.datetime.now() - datetime.timedelta(hours=6)
+now = now.strftime("%H%M")
+nowMax = datetime.datetime.now() - datetime.timedelta(hours=6,minutes=59)
+nowMax = nowMax.strftime("%H%M")
+nowDay = datetime.datetime.today() - datetime.timedelta(hours=6)
+nowDay = nowDay.strftime("%a").lower()
+```
+
+The downside of this approach is that it does not take account for the daytime saving shifts. Depends on the daytime saving shift, the timezone differece could be either ```UTC-5``` or ```UTC-6```. Therefore, it's better to use the python timezone library ```pytz``` to handle the timezone conversion. But this is good for now.
