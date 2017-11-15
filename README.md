@@ -182,6 +182,8 @@ In my usage case, I mainly logs my driving during daily commute, which means the
 
 Here, I will be implementing an automated deployment architecture to control the log server EC2 instance so it will only be running during active hours that I specified.
 
+![EC2 Scheduler Architecture](https://d1.awsstatic.com/aws-answers/answers-images/ec2-scheduler-architecture.a2a922fbfe015dd7443c1c3bf6bfaab10878ec47.png)
+
 **References:**
 - [AWS Documentation - EC2 Scheduler on AWS](http://docs.aws.amazon.com/solutions/latest/ec2-scheduler/deployment.html)
 - [EC2 Scheduler Architecture Overview](https://aws.amazon.com/answers/infrastructure-management/ec2-scheduler/)
