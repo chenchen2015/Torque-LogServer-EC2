@@ -40,7 +40,8 @@ After connecting the server through SSH or PuTTY, let's prepare the environment 
 
 1. Update the basic environment 
 ```bash
-sudo yum update; sudo yum upgrade
+sudo yum update
+sudo yum upgrade -y
 ```
 2. Install PHP modules
 ```bash
@@ -48,12 +49,12 @@ sudo yum install php-mysql php php-xml php-mcrypt php-mbstring php-cli mysql htt
 ```
 3. Install MySQL server
 ```bash
-sudo yum install mysql-server
+sudo yum install mysql-server -y
 ```
 4. Install Git and clone the repository
 ```bash
-sudo yum install git
-git clone https://github.com/econpy/torque
+sudo yum install git -y
+git clone https://github.com/chenchen2015/Torque-LogServer-EC2 ./torque
 cd torque
 ```
 
