@@ -40,7 +40,7 @@ After connecting the server through SSH or PuTTY, let's prepare the environment 
 
 1. Update the basic environment 
 ```bash
-sudo yum update
+sudo yum update; sudo yum upgrade
 ```
 2. Install PHP modules
 ```bash
