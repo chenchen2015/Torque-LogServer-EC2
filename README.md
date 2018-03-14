@@ -45,7 +45,7 @@ sudo yum upgrade -y
 ```
 2. Install PHP modules
 ```bash
-sudo yum install php-mysql php php-xml php-mcrypt php-mbstring php-cli mysql httpd
+sudo yum install php-mysql php php-xml php-mcrypt php-mbstring php-cli mysql httpd -y
 ```
 3. Install MySQL server
 ```bash
