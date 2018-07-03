@@ -1,6 +1,7 @@
-FROM alpine:3.7
+FROM php:apache
 
-RUN apk add --no-cache mysql-client
-ENTRYPOINT ["mysql"]
+RUN apt-get update && apt-get upgrade && apt-get install -y \
+    phpmyadmin\
+	--no-install-recommends && rm -r /var/lib/apt/lists/*
 
-RUN apk add --no-cache curl php7 php7-apache2 php7-json php7-mysqli php7-cli
+COPY web/ /var/www/html/
